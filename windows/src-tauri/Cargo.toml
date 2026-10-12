@@ -1,6 +1,6 @@
 [package]
 name = "portly-app"
-version = "0.1.14"
+version = "0.1.15"
 description = "Portly for Windows: tray app and window for the Portly dev server supervisor"
 authors = ["Portly"]
 license = "MIT"
