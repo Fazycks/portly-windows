@@ -6,6 +6,24 @@ Use persistent projects for long-lived, reusable services. Use top-level **Tempo
 
 Portly requires macOS 14 or newer and Swift 6.
 
+## Windows
+
+This fork adds a Windows version of Portly: the Go supervisor in [`cli/`](cli) running on Windows, plus a Tauri v2 app in [`windows/`](windows) with the same tray popover, dashboard, Resources screen, Settings, and onboarding as the macOS app.
+
+**Install:** download `Portly_<version>_x64-setup.exe` from the [latest release](https://github.com/Fazycks/portly-windows/releases/latest) and run it. It installs per user (no admin), adds `portly.exe` to your user `PATH`, and offers to remove a previous Portly install, since both would claim `127.0.0.1:7737`. The installer is not code-signed, so SmartScreen may warn on first run.
+
+On Windows, servers run in ConPTY, process trees are stopped with Job Objects, `portly forever` uses a per-user Task Scheduler task instead of launchd/systemd, and config and logs live in `%APPDATA%\Portly`. The CLI commands are the same as on macOS.
+
+Build from source (Go, Rust, Node.js, and pnpm required):
+
+```bash
+cd windows
+pnpm install
+pnpm tauri build
+```
+
+The NSIS installer is written to `windows/src-tauri/target/release/bundle/nsis/`.
+
 ## Smart resource dashboard
 
 The native **Resources** screen samples every Portly-owned process tree every two seconds and keeps a five-minute memory history. It shows physical footprint, resident RAM, CPU, project trends, and the current user's heaviest processes running outside Portly. Configure the optional global project limit and per-project inherit/off/custom overrides in **Settings → Memory**. A project restarts after three consecutive over-limit footprint samples, then sampling starts fresh on the replacement processes.
