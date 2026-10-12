@@ -1,21 +1,20 @@
 /* MenuBarContent.swift — the tray popover (MenuBarExtra .window style). */
 
-/* The popover window is frameless and transparent; only the panel paints. */
+/* The popover window is frameless and opaque, sized to the panel by the app;
+   the panel fills it edge to edge and Windows draws the rounded corners and
+   shadow. Painting the page too means no other surface can ever show. */
 html.popover-scene,
 html.popover-scene body,
 html.popover-scene #root {
-  background: transparent;
-  height: auto;
+  background: var(--popover-bg);
   overflow: hidden;
 }
 
 .mb {
-  width: 320px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: var(--popover-bg);
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 0.5px var(--control-border);
   overflow: hidden;
   color: var(--label);
 }

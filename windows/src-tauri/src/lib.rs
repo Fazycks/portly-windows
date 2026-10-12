@@ -23,6 +23,9 @@ const TRAY_ID: &str = "portly";
 /// A click on the tray icon first blurs (and hides) the popover; the click that
 /// follows must not reopen it.
 const REOPEN_GUARD: Duration = Duration::from_millis(350);
+/// Popover panel size in logical px (MenuBarContent: width 320).
+const POPOVER_WIDTH: f64 = 320.0;
+const POPOVER_HEIGHT: f64 = 300.0;
 const POLL_INTERVAL: Duration = Duration::from_secs(2);
 
 #[derive(Default)]
@@ -36,6 +39,8 @@ struct Shared {
     /// Tray icon rect (physical px) of the last click, used to anchor the popover.
     anchor: Option<(PhysicalPosition<f64>, PhysicalSize<f64>)>,
     popover_hidden_at: Option<Instant>,
+    /// Panel content height (CSS px) reported by the popover page; 0 until it renders.
+    popover_height: f64,
 }
 
 struct AppState(Mutex<Shared>);
@@ -150,9 +155,15 @@ fn place_popover(app: &AppHandle, win: &WebviewWindow) {
         .flatten()
         .or_else(|| app.primary_monitor().ok().flatten());
     let Some(monitor) = monitor else { return };
-    let Ok(size) = win.outer_size() else { return };
-    let (w, h) = (size.width as f64, size.height as f64);
-    let gap = 8.0 * monitor.scale_factor();
+    // Size for the monitor the popover opens on: a logical size would use the
+    // scale of wherever the window was last, which differs across monitors.
+    let scale = monitor.scale_factor();
+    let height = match state(app).popover_height {
+        h if h > 0.0 => h,
+        _ => POPOVER_HEIGHT,
+    };
+    let (w, h) = ((POPOVER_WIDTH * scale).round(), (height * scale).round());
+    let gap = 8.0 * scale;
 
     let wa = monitor.work_area();
     let (wl, wt) = (wa.position.x as f64, wa.position.y as f64);
@@ -192,7 +203,12 @@ fn place_popover(app: &AppHandle, win: &WebviewWindow) {
     };
     let x = x.min(wr - gap - w).max(wl + gap);
     let y = y.min(wb - gap - h).max(wt + gap);
-    let _ = win.set_position(PhysicalPosition::new(x.round() as i32, y.round() as i32));
+    let pos = PhysicalPosition::new(x.round() as i32, y.round() as i32);
+    // Move first so a DPI change from crossing monitors is applied before the
+    // final size; then size, then move again in case the move rescaled it.
+    let _ = win.set_position(pos);
+    let _ = win.set_size(PhysicalSize::new(w as u32, h as u32));
+    let _ = win.set_position(pos);
 }
 
 // ---------------------------------------------------------------- windows
@@ -266,6 +282,25 @@ fn open_settings(app: AppHandle, tab: Option<String>) {
     show_window(&app, "settings");
     if let Some(tab) = tab {
         let _ = app.emit_to("settings", "settings-tab", tab);
+    }
+}
+
+/// The popover page reports its content height so the window hugs the panel.
+#[tauri::command]
+fn set_popover_height(app: AppHandle, height: f64) {
+    if !(height.is_finite() && height > 0.0) {
+        return;
+    }
+    let changed = {
+        let mut s = state(&app);
+        let changed = (s.popover_height - height).abs() >= 0.5;
+        s.popover_height = height;
+        changed
+    };
+    if let Some(win) = app.get_webview_window("popover") {
+        if changed && win.is_visible().unwrap_or(false) {
+            place_popover(&app, &win);
+        }
     }
 }
 
@@ -440,6 +475,7 @@ pub fn run() {
             open_main,
             open_settings,
             hide_popover,
+            set_popover_height,
             quit_app,
             set_tray_state,
             get_prefs,

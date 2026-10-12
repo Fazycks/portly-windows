@@ -34,6 +34,8 @@ export const native = {
   /** Show the Settings window on a tab: "general" | "servers" | "memory" | "inactivity". */
   openSettings: (tab?: string) => invoke("open_settings", { tab: tab ?? null }),
   hidePopover: () => invoke("hide_popover"),
+  /** Popover content height in CSS px; the app sizes and re-anchors the window. */
+  setPopoverHeight: (height: number) => invoke("set_popover_height", { height }),
   /** Stops every server through the daemon, then exits (the app is the supervisor). */
   quit: () => invoke("quit_app"),
   /** Tray glyph: dot filled when something runs, warning badge on problems. */

@@ -1,7 +1,6 @@
 // Port of MenuBarContent.swift: the tray popover. Everything you need without
 // opening the window, and a way in when you do.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 import { api, type ProjectStatus, type ServerStatus } from "../lib/api";
 import { native } from "../lib/native";
 import { act, usePortly, useCounts } from "../lib/store";
@@ -9,15 +8,13 @@ import { Symbol } from "../lib/symbols";
 import { Divider, hexColor, StartStopButton, StatusDot } from "../components/ui";
 import "./MenuBarContent.css";
 
-const WIDTH = 320;
-
 export default function MenuBarContent() {
   const { status } = usePortly();
   const { running, total, problem } = useCounts();
   const panel = useRef<HTMLDivElement>(null);
   const projects = status?.projects ?? [];
 
-  // The popover window is transparent: only the rounded panel paints.
+  // The popover page paints the panel colour edge to edge.
   useLayoutEffect(() => {
     document.documentElement.classList.add("popover-scene");
   }, []);
@@ -27,7 +24,8 @@ export default function MenuBarContent() {
     void native.setTrayState(running, total, problem).catch(() => {});
   }, [running, total, problem]);
 
-  // A menu bar window sizes itself to its content: follow the panel's height.
+  // A menu bar window sizes itself to its content: report the panel's height;
+  // the app converts it for the monitor the popover opens on.
   useLayoutEffect(() => {
     const el = panel.current;
     if (!el) return;
@@ -36,7 +34,7 @@ export default function MenuBarContent() {
       const h = Math.ceil(el.getBoundingClientRect().height);
       if (h > 0 && h !== last) {
         last = h;
-        void getCurrentWindow().setSize(new LogicalSize(WIDTH, h)).catch(() => {});
+        void native.setPopoverHeight(h).catch(() => {});
       }
     };
     fit();
