@@ -1,0 +1,140 @@
+/* MenuBarContent.swift — the tray popover (MenuBarExtra .window style). */
+
+/* The popover window is frameless and transparent; only the panel paints. */
+html.popover-scene,
+html.popover-scene body,
+html.popover-scene #root {
+  background: transparent;
+  height: auto;
+  overflow: hidden;
+}
+
+.mb {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  background: var(--popover-bg);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 0.5px var(--control-border);
+  overflow: hidden;
+  color: var(--label);
+}
+
+.mb-spacer { flex: 1; min-width: 0; }
+
+/* Header: "Portly" 13 semibold, "N/M running" 11 secondary; padding h12 v8. */
+.mb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.mb-title { font-size: 13px; font-weight: 600; }
+.mb-summary { font-size: 11px; color: var(--secondary-label); }
+
+/* Empty state: VStack(spacing 6) padding 12. */
+.mb-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+}
+.mb-empty-title { font-size: 12px; font-weight: 500; }
+.mb-empty-desc { font-size: 11px; color: var(--secondary-label); }
+
+/* Project list: ScrollView capped at 420pt, VStack(spacing 2) padding v6. */
+.mb-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.mb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+}
+.mb-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Project header: HStack(spacing 6) padding h12, top 6, bottom 2. */
+.mb-project {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 2px;
+}
+.mb-project-icon {
+  width: 13px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mb-project-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--secondary-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mb-project button.borderless,
+.mb-row button.borderless { padding: 0 1px; }
+
+/* Server row: HStack(spacing 8) padding h12 v3; hover secondary@0.12, radius 5, inset 6. */
+.mb-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 12px;
+}
+.mb-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 6px;
+  border-radius: 5px;
+  background: transparent;
+  transition: background var(--dur-hover) ease-out;
+  pointer-events: none;
+}
+.mb-row.hover::before { background: var(--fill-hover); }
+.mb-row > * { position: relative; }
+.mb-row-name {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.mb-row-port {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--secondary-label);
+  white-space: nowrap;
+  flex: none;
+}
+.mb-row-spacer { flex: 1; min-width: 4px; }
+
+/* Footer: HStack(spacing 8) of borderless text buttons, font 12, padding h12 v8. */
+.mb-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.mb-link {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--label);
+  white-space: nowrap;
+}
+.mb-link:active:not(:disabled) { opacity: 0.6; }
+.mb-link:disabled { color: var(--tertiary-label); }

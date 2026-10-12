@@ -1,0 +1,122 @@
+.server-detail {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.server-detail-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* .clipped() */
+}
+
+/* Info bar (.regularMaterial) */
+.info-bar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--window-bg) 70%, var(--content-bg));
+}
+.info-bar-row,
+.info-bar-resources {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.info-bar-row { gap: 14px; }
+.info-bar-resources { gap: 18px; }
+.info-bar-spacer { flex: 1; min-width: 8px; }
+.info-bar-error {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--secondary-label);
+  white-space: nowrap;
+  flex: none;
+}
+
+.resource-toggle {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--secondary-label);
+  transition: background var(--dur-state) var(--ease-state), color var(--dur-state) var(--ease-state);
+}
+.resource-toggle.on {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.resource-toggle:active { opacity: 0.6; }
+
+.compact-resource {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.details-button.btn-borderless {
+  gap: 5px;
+  font-size: 13px;
+  color: var(--accent);
+}
+.details-button.btn-borderless:hover:not(:disabled) { color: var(--accent); }
+
+/* Port conflict banner — slides down from the top edge (Motion.banner). */
+.conflict-wrap {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  animation: banner-in 260ms var(--ease-state);
+}
+@keyframes banner-in { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+.conflict-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  background: color-mix(in srgb, var(--sys-orange) 12%, transparent);
+}
+.conflict-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.conflict-title { font-size: 12px; font-weight: 500; }
+.conflict-desc { font-size: 11px; color: var(--secondary-label); }
+
+/* Pane swap (Motion.paneSwap) */
+.pane-swap { animation: pane-in 200ms ease-out; }
+@keyframes pane-in { from { opacity: 0; } to { opacity: 1; } }
+.terminal-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.stopped-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 0 24px;
+}
+.stopped-texts { display: flex; flex-direction: column; align-items: center; gap: 4px; }

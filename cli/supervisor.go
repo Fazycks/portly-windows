@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -79,7 +78,9 @@ func (s *supervisor) syncRuntimes() {
 	}
 	for id, rt := range s.runtimes {
 		if !seen[id] && !temp[id] {
-			rt.stop(nil)
+			// Release the log file once the process is gone (Windows keeps
+			// open files locked).
+			rt.stop(rt.logs.close)
 			delete(s.runtimes, id)
 		}
 	}
@@ -114,6 +115,7 @@ func (s *supervisor) scheduleTemporaryCleanup(id string) {
 		if !found {
 			return
 		}
+		rt.logs.close()
 		delete(s.runtimes, id)
 		filtered := s.temporaryIDs[:0]
 		for _, tid := range s.temporaryIDs {
@@ -361,7 +363,7 @@ func (s *supervisor) terminateEverything() {
 	}
 	for _, rt := range s.allRuntimes() {
 		if pid := rt.currentPID(); pid > 0 {
-			_ = syscall.Kill(-pid, syscall.SIGKILL)
+			killProcessTree(pid)
 		}
 	}
 }
@@ -480,6 +482,9 @@ func (s *supervisor) removeServer(id string) {
 func (s *supervisor) dropTemporary(id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if rt := s.runtimes[id]; rt != nil {
+		rt.logs.close()
+	}
 	delete(s.runtimes, id)
 	filtered := s.temporaryIDs[:0]
 	for _, tid := range s.temporaryIDs {
@@ -701,6 +706,16 @@ func (s *supervisor) isTemporaryID(id string) bool {
 
 func (s *supervisor) close() {
 	s.store.stopWatching()
+	s.mu.Lock()
+	for _, rt := range s.runtimes {
+		rt.mu.Lock()
+		if rt.child != nil {
+			rt.child.forceKill()
+		}
+		rt.mu.Unlock()
+		rt.logs.close()
+	}
+	s.mu.Unlock()
 	select {
 	case <-s.quit:
 	default:

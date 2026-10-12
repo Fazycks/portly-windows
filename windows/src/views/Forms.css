@@ -1,0 +1,147 @@
+/* Forms.swift — grouped-form rows, IconColorPicker, SuggestionRow. */
+:root { --pf-primary: 0, 0, 0; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --pf-primary: 255, 255, 255; }
+}
+:root[data-theme="dark"] { --pf-primary: 255, 255, 255; }
+
+/* Sheet chrome: VStack(spacing: 0) { Form; Divider; HStack.padding(14) } */
+.pf-sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 24px);
+}
+.pf-sheet > .form-grouped { flex: 1 1 auto; min-height: 0; background: var(--window-bg); }
+.pf-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  flex: none;
+}
+.pf-error { font-size: 11px; color: var(--sys-red); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* .font(.caption).foregroundStyle(.secondary) */
+.pf-caption { font-size: 10px; color: var(--secondary-label); line-height: 1.3; }
+
+/* TextField("Title", text:) inside Form(.grouped) */
+.pf-field-row { gap: 12px; }
+.pf-field-row.multiline { align-items: flex-start; }
+.pf-field-row.multiline .pf-field-label { padding-top: 2px; }
+.pf-field-label { flex: none; white-space: nowrap; }
+.pf-input {
+  flex: 1;
+  min-width: 0;
+  height: 20px;
+  padding: 0 2px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  user-select: text;
+  cursor: text;
+}
+.pf-input.mono { font-family: var(--font-mono); font-size: 12px; }
+textarea.pf-input {
+  height: auto;
+  resize: none;
+  line-height: 16px;
+  padding: 2px;
+  white-space: pre;
+  overflow: auto;
+}
+/* .textFieldStyle(.roundedBorder) */
+.pf-input.bordered {
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: var(--control-bg);
+  box-shadow: inset 0 0 0 0.5px var(--control-border), 0 0.5px 0 rgba(0, 0, 0, 0.04);
+}
+.pf-input.bordered:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+.pf-toggle-row .toggle { flex: 1; }
+
+/* Label { } icon: { } */
+.pf-label-row { align-items: flex-start; gap: 7px; }
+.pf-label-icon { display: inline-flex; width: 18px; justify-content: center; flex: none; padding-top: 1px; }
+.pf-label-text { flex: 1; min-width: 0; line-height: 1.3; }
+
+/* DisclosureGroup in a grouped Form */
+button.pf-disclosure {
+  width: 100%;
+  border: none;
+  background: none;
+  text-align: left;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.pf-disclosure-chevron {
+  display: inline-flex;
+  color: var(--secondary-label);
+  transition: transform var(--dur-state) var(--ease-state);
+}
+.pf-disclosure-chevron.open { transform: rotate(90deg); }
+
+/* SuggestionRow */
+button.pf-suggestion {
+  width: 100%;
+  border: none;
+  background: none;
+  text-align: left;
+  gap: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.pf-suggestion-icon { width: 20px; display: inline-flex; justify-content: center; flex: none; }
+.pf-suggestion-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pf-suggestion-text > .mono { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-suggestion-meta { display: flex; gap: 6px; font-size: 10px; color: var(--secondary-label); }
+/* Image(systemName: "circle") at 15pt, secondary.opacity(0.6) */
+.pf-circle {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin: 0 0.5px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--secondary-label) 60%, transparent);
+}
+
+/* IconColorPicker */
+.icp { display: flex; align-items: flex-start; gap: 16px; padding: 6px 0; }
+.icp-preview {
+  width: 54px;
+  height: 54px;
+  flex: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icp-groups { display: flex; flex-direction: column; gap: 13px; }
+.icp-group { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
+.icp-colors { display: flex; gap: 7px; }
+.icp-color {
+  width: 26px;
+  height: 26px;
+  padding: 4px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  display: inline-flex;
+}
+.icp-color > span { width: 18px; height: 18px; border-radius: 50%; }
+.icp-color:active > span { filter: brightness(0.9); }
+.icp-symbols { display: grid; grid-template-columns: repeat(9, 30px); gap: 5px; }
+.icp-symbol {
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur-hover) ease;
+}
+.icp-symbol:active { opacity: 0.7; }

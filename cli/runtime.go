@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -320,16 +319,15 @@ func (r *serverRuntime) stop(then func()) {
 		r.restartTimer = nil
 	}
 	r.stopThen = then
-	group := r.child.pgid
-	r.logs.note(fmt.Sprintf("stopping (SIGTERM to process group %d)", group))
-	r.child.signalGroup(syscall.SIGTERM)
+	r.logs.note(r.child.stopNote())
+	r.child.terminate()
 	if r.killTimer != nil {
 		r.killTimer.Stop()
 	}
 	child := r.child
 	r.killTimer = time.AfterFunc(5*time.Second, func() {
-		r.logs.note("did not exit in 5s, sending SIGKILL")
-		child.signalGroup(syscall.SIGKILL)
+		r.logs.note(child.killNote())
+		child.forceKill()
 	})
 	r.mu.Unlock()
 }

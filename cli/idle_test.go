@@ -127,11 +127,12 @@ func TestIdleTimeoutConfigRoundTripMatchesSwiftKeys(t *testing.T) {
 func TestRuntimeStopsAfterInactivity(t *testing.T) {
 	t.Setenv("PORTLY_HOME", t.TempDir())
 	seconds := 1
-	cfg := newServerConfig("quiet", "sleep 30")
+	cfg := newServerConfig("quiet", testSleep)
 	cfg.IdleTimeoutSeconds = &seconds
 	project := newProject("Idle", t.TempDir())
 	rt := newRuntime(cfg, project, defaultConfig())
 	rt.start()
+	defer rt.logs.close()
 	defer rt.stop(nil)
 
 	waitUntil(t, 3*time.Second, func() bool { return rt.currentPID() > 0 })

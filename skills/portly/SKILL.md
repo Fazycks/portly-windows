@@ -1,13 +1,13 @@
 ---
 name: portly
-description: Manage persistent projects and temporary local processes with the Portly macOS app and CLI. Use when an agent needs to run, start, stop, restart, inspect logs or health, configure projects and ports, adopt external listeners, resolve port conflicts, or enable launch at login.
+description: Manage persistent projects and temporary local processes with the Portly app (macOS or Windows) and CLI. Use when an agent needs to run, start, stop, restart, inspect logs or health, configure projects and ports, adopt external listeners, resolve port conflicts, or enable launch at login.
 ---
 
 # Portly
 
 Use the `portly` CLI as the primary interface. Every command launches Portly.app automatically if needed; this is a state-changing side effect even for `status` when the app was closed.
 
-If `portly` is not available on `PATH`, use the onboarding-installed CLI at `$HOME/.local/bin/portly`, or the copy bundled with the app at `/Applications/Portly.app/Contents/Resources/portly-cli`.
+If `portly` is not available on `PATH`, use the onboarding-installed CLI at `$HOME/.local/bin/portly`, or the copy bundled with the app at `/Applications/Portly.app/Contents/Resources/portly-cli`. On Windows the installer puts `portly.exe` on the user `PATH` (`%LOCALAPPDATA%\Portly\bin\portly.exe`).
 
 ## Inspect first
 
@@ -123,3 +123,7 @@ Use `portly forever disable --json` to unload the LaunchAgent recoverably while 
 ## Linux
 
 On Linux, use the headless `portly` binary from this repository's `cli/` folder. It is the supervisor: commands auto-start a loopback daemon and speak the same API as macOS. Do not install `Portly.app`. `open` has no window and reports that. `forever` uses a systemd user unit, not launchd; it errors clearly when systemd is missing. Do not run the macOS app and the Linux daemon against the same `7737` port.
+
+## Windows
+
+On Windows, `portly.exe` talks to the `portlyd.exe` supervisor installed next to it; commands auto-start it on `127.0.0.1:7737`, and the Portly tray app is a window onto the same daemon. Servers run in a ConPTY under a Job Object, so stopping a server sends Ctrl+C and then ends the whole process tree; `kill-port` uses `taskkill /T`. Configuration and logs live in `%APPDATA%\Portly\` instead of `~/.config/portly/`. `forever` registers a per-user Task Scheduler task (`Portly Forever`) that starts the daemon at logon; it needs no administrator rights. Commands run through `cmd.exe /c` unless `PORTLY_SHELL` names another shell.

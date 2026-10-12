@@ -1,0 +1,85 @@
+/* AgentSetup.swift — AgentOnboardingCard / SetupStep */
+:root { --as-primary: 0, 0, 0; --as-material: rgba(246, 246, 246, 0.82); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --as-primary: 255, 255, 255; --as-material: rgba(40, 40, 42, 0.82); }
+}
+:root[data-theme="dark"] { --as-primary: 255, 255, 255; --as-material: rgba(40, 40, 42, 0.82); }
+
+/* .padding(.horizontal, 14).padding(.top, 12).padding(.bottom, 2) */
+.agent-card-wrap { padding: 12px 14px 2px; }
+
+.agent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  /* .regularMaterial + .shadow(black 0.08, radius 14, y 5) + 0.75pt primary(0.08) stroke */
+  background: var(--as-material);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: inset 0 0 0 0.75px rgba(var(--as-primary), 0.08), 0 5px 28px rgba(0, 0, 0, 0.08);
+}
+
+.agent-card-head { display: flex; align-items: flex-start; gap: 12px; }
+.agent-card-badge {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.agent-card-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; line-height: 1.3; }
+.agent-card-spacer { flex: 1; min-width: 12px; }
+/* .buttonStyle(.borderless) text button: accent-tinted on macOS */
+.btn.agent-card-notnow { color: var(--accent); padding: 2px 0; font-size: 13px; }
+.btn.agent-card-notnow:hover:not(:disabled) { color: var(--accent); }
+
+.agent-card-steps { display: flex; gap: 10px; }
+
+.setup-step {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 9px;
+  background: rgba(var(--as-primary), 0.045);
+}
+.setup-step-icon { display: inline-flex; flex: none; width: 18px; justify-content: center; }
+.setup-step-number {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.setup-step-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.setup-step-detail {
+  font-size: 10px;
+  color: var(--secondary-label);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.setup-step-spacer { flex: 1; min-width: 8px; }
+
+.agent-card-error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--sys-red);
+}

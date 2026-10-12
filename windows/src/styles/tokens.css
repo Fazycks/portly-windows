@@ -1,0 +1,166 @@
+/* macOS semantic colours (AppKit system colours), light and dark.
+   Every view reads these tokens so the port tracks SwiftUI's .primary/.secondary,
+   separators, system tints and window materials. */
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+:root {
+  color-scheme: light;
+  --font-ui: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", "Cascadia Code", Consolas, "SF Mono", monospace;
+
+  --window-bg: #ececec;          /* windowBackgroundColor */
+  --content-bg: #ffffff;         /* controlBackgroundColor / textBackgroundColor */
+  --sidebar-bg: #e3e3e6;         /* sidebar material over the desktop */
+  --under-page-bg: #f5f5f7;
+  --grouped-bg: #f2f2f4;         /* Form(.grouped) background */
+  --grouped-row-bg: #ffffff;
+  --popover-bg: #f6f6f6;         /* menu bar extra window material */
+
+  --label: rgba(0, 0, 0, 0.85);
+  --secondary-label: rgba(0, 0, 0, 0.5);
+  --tertiary-label: rgba(0, 0, 0, 0.26);
+  --quaternary-label: rgba(0, 0, 0, 0.1);
+  --separator: rgba(0, 0, 0, 0.1);
+  --grid: rgba(0, 0, 0, 0.06);
+  --fill-secondary: rgba(0, 0, 0, 0.05);   /* Color.secondary.opacity(0.12) on white ≈ */
+  --fill-hover: rgba(118, 118, 128, 0.12); /* Color.secondary.opacity(0.12) */
+  --selection: rgba(0, 0, 0, 0.1);         /* inactive sidebar selection */
+  --control-bg: #ffffff;
+  --control-border: rgba(0, 0, 0, 0.12);
+  --shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.12);
+  --window-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.18), 0 10px 30px rgba(0, 0, 0, 0.18);
+
+  --accent: #007aff;
+  --accent-text: #ffffff;
+  --sys-red: #ff3b30;
+  --sys-orange: #ff9500;
+  --sys-yellow: #ffcc00;
+  --sys-green: #34c759;
+  --sys-mint: #00c7be;
+  --sys-teal: #30b0c7;
+  --sys-cyan: #32ade6;
+  --sys-blue: #007aff;
+  --sys-indigo: #5856d6;
+  --sys-purple: #af52de;
+  --sys-pink: #ff2d55;
+  --sys-brown: #a2845e;
+  --sys-gray: #8e8e93;
+
+  /* TerminalTheme (fixed in both appearances) */
+  --term-bg: rgb(11, 13, 18);
+  --term-fg: rgb(214, 219, 230);
+  --term-border: rgb(51, 59, 74);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --window-bg: #1e1e1e;
+    --content-bg: #1e1e1e;
+    --sidebar-bg: #2a2a2c;
+    --under-page-bg: #282828;
+    --grouped-bg: #1e1e1e;
+    --grouped-row-bg: rgba(255, 255, 255, 0.05);
+    --popover-bg: #2b2b2d;
+    --label: rgba(255, 255, 255, 0.85);
+    --secondary-label: rgba(255, 255, 255, 0.55);
+    --tertiary-label: rgba(255, 255, 255, 0.25);
+    --quaternary-label: rgba(255, 255, 255, 0.1);
+    --separator: rgba(255, 255, 255, 0.1);
+    --grid: rgba(255, 255, 255, 0.07);
+    --fill-secondary: rgba(255, 255, 255, 0.06);
+    --fill-hover: rgba(118, 118, 128, 0.24);
+    --selection: rgba(255, 255, 255, 0.1);
+    --control-bg: rgba(255, 255, 255, 0.1);
+    --control-border: rgba(255, 255, 255, 0.08);
+    --shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --window-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12), 0 10px 30px rgba(0, 0, 0, 0.5);
+    --accent: #0a84ff;
+    --sys-red: #ff453a;
+    --sys-orange: #ff9f0a;
+    --sys-yellow: #ffd60a;
+    --sys-green: #30d158;
+    --sys-mint: #63e6e2;
+    --sys-teal: #40c8e0;
+    --sys-cyan: #64d2ff;
+    --sys-blue: #0a84ff;
+    --sys-indigo: #5e5ce6;
+    --sys-purple: #bf5af2;
+    --sys-pink: #ff375f;
+    --sys-brown: #ac8e68;
+    --sys-gray: #98989d;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --window-bg: #1e1e1e;
+  --content-bg: #1e1e1e;
+  --sidebar-bg: #2a2a2c;
+  --under-page-bg: #282828;
+  --grouped-bg: #1e1e1e;
+  --grouped-row-bg: rgba(255, 255, 255, 0.05);
+  --popover-bg: #2b2b2d;
+  --label: rgba(255, 255, 255, 0.85);
+  --secondary-label: rgba(255, 255, 255, 0.55);
+  --tertiary-label: rgba(255, 255, 255, 0.25);
+  --quaternary-label: rgba(255, 255, 255, 0.1);
+  --separator: rgba(255, 255, 255, 0.1);
+  --grid: rgba(255, 255, 255, 0.07);
+  --fill-secondary: rgba(255, 255, 255, 0.06);
+  --fill-hover: rgba(118, 118, 128, 0.24);
+  --selection: rgba(255, 255, 255, 0.1);
+  --control-bg: rgba(255, 255, 255, 0.1);
+  --control-border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --window-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12), 0 10px 30px rgba(0, 0, 0, 0.5);
+  --accent: #0a84ff;
+  --sys-red: #ff453a;
+  --sys-orange: #ff9f0a;
+  --sys-yellow: #ffd60a;
+  --sys-green: #30d158;
+  --sys-mint: #63e6e2;
+  --sys-teal: #40c8e0;
+  --sys-cyan: #64d2ff;
+  --sys-blue: #0a84ff;
+  --sys-indigo: #5e5ce6;
+  --sys-purple: #bf5af2;
+  --sys-pink: #ff375f;
+  --sys-brown: #ac8e68;
+  --sys-gray: #98989d;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 13px;               /* SwiftUI .body on macOS */
+  line-height: 1.25;
+  color: var(--label);
+  background: var(--window-bg);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+  font-feature-settings: "cv11", "ss01";
+}
+
+input, textarea, select, button { font: inherit; color: inherit; }
+.mono { font-family: var(--font-mono); }
+.digits { font-variant-numeric: tabular-nums; }   /* .monospacedDigit() */
+.secondary { color: var(--secondary-label); }
+.tertiary { color: var(--tertiary-label); }
+.selectable { user-select: text; cursor: text; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--tertiary-label); border-radius: 5px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--secondary-label); background-clip: content-box; border: 2px solid transparent; }
+::-webkit-scrollbar-track { background: transparent; }

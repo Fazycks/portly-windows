@@ -1,3 +1,5 @@
+//go:build !windows
+
 package main
 
 import (
@@ -79,6 +81,37 @@ func (c *childProcess) signalGroup(sig syscall.Signal) {
 	_ = syscall.Kill(c.pgid, sig)
 }
 
+// terminate asks the whole process group to exit (SIGTERM).
+func (c *childProcess) terminate() { c.signalGroup(syscall.SIGTERM) }
+
+// forceKill ends the whole process group (SIGKILL).
+func (c *childProcess) forceKill() { c.signalGroup(syscall.SIGKILL) }
+
+func (c *childProcess) stopNote() string {
+	return fmt.Sprintf("stopping (SIGTERM to process group %d)", c.pgid)
+}
+
+func (c *childProcess) killNote() string { return "did not exit in 5s, sending SIGKILL" }
+
+// write sends keyboard input to the PTY.
+func (c *childProcess) write(data []byte) error {
+	if c == nil || c.pty == nil {
+		return fmt.Errorf("this process has no terminal")
+	}
+	_, err := c.pty.Write(data)
+	return err
+}
+
+func (c *childProcess) resize(cols, rows int) error {
+	if c == nil || c.pty == nil {
+		return nil
+	}
+	return pty.Setsize(c.pty, &pty.Winsize{Cols: uint16(cols), Rows: uint16(rows)})
+}
+
+// killProcessTree force-kills a process group rooted at pid.
+func killProcessTree(pid int) { _ = syscall.Kill(-pid, syscall.SIGKILL) }
+
 func (c *childProcess) wait() error {
 	if c == nil || c.cmd == nil {
 		return nil
@@ -113,31 +146,7 @@ func exitCodeFromWait(err error) int {
 	return 1
 }
 
-func childEnv(base map[string]string, server string, port *int, extra map[string]string) []string {
-	envMap := map[string]string{}
-	for _, kv := range os.Environ() {
-		if i := indexByte([]byte(kv), '='); i > 0 {
-			envMap[kv[:i]] = kv[i+1:]
-		}
-	}
-	delete(envMap, "NO_COLOR")
-	envMap["TERM"] = "xterm-256color"
-	envMap["COLORTERM"] = "truecolor"
-	envMap["FORCE_COLOR"] = "1"
-	envMap["CLICOLOR"] = "1"
-	envMap["CLICOLOR_FORCE"] = "1"
-	envMap["TERM_PROGRAM"] = "Portly"
-	envMap["PORTLY"] = "1"
-	envMap["PORTLY_SERVER"] = server
-	if port != nil {
-		envMap["PORT"] = fmt.Sprintf("%d", *port)
-	}
-	for k, v := range extra {
-		envMap[k] = v
-	}
-	out := make([]string, 0, len(envMap))
-	for k, v := range envMap {
-		out = append(out, k+"="+v)
-	}
-	return out
-}
+// hideWindow is a no-op outside Windows.
+func hideWindow(cmd *exec.Cmd) {}
+
+func allowConsoleInterrupts() {}

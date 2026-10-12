@@ -1,0 +1,23 @@
+.terminal-pane {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+}
+.terminal-surface {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  border: 1px solid;
+}
+.terminal-host {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.terminal-host .xterm { height: 100%; }
+.terminal-host .xterm-viewport { background-color: transparent !important; }
+.terminal-host .xterm .xterm-scrollable-element > .scrollbar > .slider { border-radius: 4px; }

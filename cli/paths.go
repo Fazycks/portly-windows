@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -13,6 +14,11 @@ func nowTime() time.Time { return time.Now() }
 func homeDir() string {
 	if override := os.Getenv("PORTLY_HOME"); override != "" {
 		return override
+	}
+	if runtime.GOOS == "windows" {
+		if appData, err := os.UserConfigDir(); err == nil {
+			return filepath.Join(appData, "Portly")
+		}
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -26,8 +32,9 @@ func logsDir() string    { return filepath.Join(homeDir(), "logs") }
 func logFile(id string) string {
 	return filepath.Join(logsDir(), id+".log")
 }
-func daemonPIDFile() string { return filepath.Join(homeDir(), "daemon.pid") }
-func daemonLogFile() string { return filepath.Join(logsDir(), "portly-daemon.log") }
+func daemonPIDFile() string  { return filepath.Join(homeDir(), "daemon.pid") }
+func daemonPortFile() string { return filepath.Join(homeDir(), "daemon.port") }
+func daemonLogFile() string  { return filepath.Join(logsDir(), "portly-daemon.log") }
 
 func ensureDirs() error {
 	if err := os.MkdirAll(homeDir(), 0o755); err != nil {

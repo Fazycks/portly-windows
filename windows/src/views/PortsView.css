@@ -1,0 +1,145 @@
+/* PortsView.swift */
+:root {
+  --pv-primary-07: rgba(0, 0, 0, 0.07);
+  --pv-primary-08: rgba(0, 0, 0, 0.08);
+  --pv-hover: rgba(0, 0, 0, 0.035);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pv-primary-07: rgba(255, 255, 255, 0.07);
+    --pv-primary-08: rgba(255, 255, 255, 0.08);
+    --pv-hover: rgba(255, 255, 255, 0.04);
+  }
+}
+:root[data-theme="dark"] {
+  --pv-primary-07: rgba(255, 255, 255, 0.07);
+  --pv-primary-08: rgba(255, 255, 255, 0.08);
+  --pv-hover: rgba(255, 255, 255, 0.04);
+}
+
+.pv-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--window-bg);
+  color: var(--label);
+  font-family: var(--font-ui);
+}
+.pv-hstack { display: flex; align-items: center; min-width: 0; }
+.pv-vstack { display: flex; flex-direction: column; align-items: stretch; }
+.pv-spacer { flex: 1 1 0; min-width: 0; }
+.pv-line1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* header */
+.pv-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  flex: none;
+}
+.pv-header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.pv-title { font-size: 20px; font-weight: 600; line-height: 1.2; }
+.pv-summary { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* content states */
+.pv-center {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.pv-loading-label { font-size: 13px; }
+.pv-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.pv-list { display: flex; flex-direction: column; gap: 14px; padding: 18px; }
+
+/* cards */
+.pv-card {
+  background: var(--control-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  flex: none;
+}
+.pv-card-system {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04), inset 0 0 0 1px var(--pv-primary-07);
+}
+.pv-card-group {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.055), inset 0 0 0 1px var(--pv-primary-08);
+}
+.pv-card-toggle {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  cursor: default;
+  color: var(--label);
+  font-family: var(--font-ui);
+}
+.pv-card-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 12px; }
+
+.pv-system-header { gap: 10px; padding: 10px 12px; }
+.pv-system-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-label);
+  background: color-mix(in srgb, var(--secondary-label) 12%, transparent);
+}
+.pv-chevron { width: 12px; flex: none; display: inline-flex; justify-content: center; }
+.pv-group-name { font-size: 13px; font-weight: 600; line-height: 16px; }
+.pv-small { font-size: 10px; line-height: 13px; }
+.pv-small-medium { font-size: 10px; font-weight: 500; white-space: nowrap; flex: none; }
+
+.pv-system-app { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
+.pv-app-icon { width: 18px; flex: none; display: inline-flex; justify-content: center; }
+.pv-app-name { font-size: 11px; font-weight: 600; }
+
+.pv-group-header { display: flex; align-items: center; gap: 9px; padding: 10px 12px; }
+.pv-group-icon { width: 20px; flex: none; display: inline-flex; justify-content: center; }
+
+.pv-other-toggle { gap: 8px; padding: 9px 12px; }
+.pv-other-label { font-size: 11px; font-weight: 500; }
+
+/* rows */
+.pv-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; min-width: 0; }
+.pv-row-system { padding: 8px 12px; }
+.pv-port {
+  width: 62px;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+.pv-row-name { font-size: 12px; font-weight: 500; line-height: 15px; }
+.pv-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex: none;
+  line-height: 11px;
+}
+.pv-detail { font-family: var(--font-mono); font-size: 10px; line-height: 13px; }
+.pv-middle { display: block; white-space: nowrap; overflow: hidden; min-width: 0; }
+.pv-lock { display: inline-flex; flex: none; }
+.pv-row .btn { flex: none; }

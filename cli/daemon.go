@@ -10,6 +10,8 @@ func runDaemon(apiPort int) error {
 	if err := ensureDirs(); err != nil {
 		return err
 	}
+	allowConsoleInterrupts()
+	migrateLegacyConfig()
 	store := newConfigStore(configFile())
 	if apiPort == 0 {
 		apiPort = store.current().APIPort
@@ -24,6 +26,10 @@ func runDaemon(apiPort int) error {
 		return err
 	}
 	defer os.Remove(daemonPIDFile())
+	// The port actually bound: config.json may name a new one that only takes
+	// effect on the next start, and the app must keep talking to this one.
+	_ = os.WriteFile(daemonPortFile(), []byte(strconv.Itoa(apiPort)+"\n"), 0o644)
+	defer os.Remove(daemonPortFile())
 
 	ch := make(chan os.Signal, 1)
 	notifySignals(ch)

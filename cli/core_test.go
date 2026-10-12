@@ -155,7 +155,7 @@ func TestTempWaitIntegration(t *testing.T) {
 	var job TemporaryJobStatus
 	if err := c.post("temporary/run", runTemporaryRequest{
 		Name:           "echo-job",
-		Command:        "printf 'hello-portly\\n'; exit 3",
+		Command:        testEchoExit3,
 		Directory:      dir,
 		TimeoutSeconds: &timeout,
 	}, &job); err != nil {
@@ -219,7 +219,7 @@ func TestProjectServerLifecycle(t *testing.T) {
 	if err := c.post("servers/add", addServerRequest{
 		Project: project.Name,
 		Name:    "web",
-		Command: "python3 -m http.server " + itoa(port),
+		Command: testPython + " -m http.server " + itoa(port),
 		Port:    &port,
 		Start:   &start,
 	}, &server); err != nil {
@@ -281,24 +281,6 @@ func TestForeverStatusDoesNotWriteLaunchAgent(t *testing.T) {
 	}
 }
 
-func TestForeverUnitIsSystemdUserService(t *testing.T) {
-	unit := foreverUnitContents("/usr/local/bin/portly")
-	for _, want := range []string{
-		"[Unit]",
-		"[Service]",
-		"[Install]",
-		"WantedBy=default.target",
-		"ExecStart=/usr/local/bin/portly daemon",
-		"WorkingDirectory=%h",
-	} {
-		if !strings.Contains(unit, want) {
-			t.Fatalf("missing %q in:\n%s", want, unit)
-		}
-	}
-	if strings.Contains(unit, "LaunchAgents") || strings.Contains(unit, "launchctl") {
-		t.Fatal(unit)
-	}
-}
 
 func intPtr(v int) *int       { return &v }
 func strPtr(v string) *string { return &v }

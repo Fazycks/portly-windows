@@ -51,7 +51,8 @@ func startAPI(sup *supervisor, port int) (*apiServer, error) {
 	mux.HandleFunc("/ports/kill", srv.post(srv.killPort))
 	mux.HandleFunc("/open", srv.post(srv.open))
 	mux.HandleFunc("/quit", srv.post(srv.quit))
-	srv.http = &http.Server{Handler: mux, ReadHeaderTimeout: 5 * time.Second}
+	srv.registerAppRoutes(mux)
+	srv.http = &http.Server{Handler: withOriginGuard(mux), ReadHeaderTimeout: 5 * time.Second}
 	go func() { _ = srv.http.Serve(ln) }()
 	return srv, nil
 }
@@ -580,6 +581,15 @@ func (s *apiServer) killPort(w http.ResponseWriter, r *http.Request) {
 func (s *apiServer) open(w http.ResponseWriter, r *http.Request) {
 	var body openRequest
 	_ = decodeBody(r, &body)
+	opened, err := openApp(body.Destination)
+	if err != nil {
+		writeFail(w, http.StatusInternalServerError, "Could not open Portly: "+err.Error())
+		return
+	}
+	if opened {
+		writeOK(w, actionResponse{Affected: []string{}, Message: "Opened Portly"})
+		return
+	}
 	writeOK(w, actionResponse{Affected: []string{}, Message: "No UI on this host. Portly is running as a headless daemon."})
 }
 
@@ -589,6 +599,7 @@ func (s *apiServer) quit(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(200 * time.Millisecond)
 		s.sup.terminateEverything()
 		s.sup.close()
+		_ = os.Remove(daemonPortFile())
 		osExit(0)
 	}()
 }

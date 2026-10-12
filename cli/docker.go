@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -32,6 +33,13 @@ func dockerExecutable() string {
 		"/opt/homebrew/bin/docker",
 		filepath.Join(home, ".docker", "bin", "docker"),
 	}
+	if runtime.GOOS == "windows" {
+		candidates = []string{
+			"docker",
+			filepath.Join(os.Getenv("ProgramFiles"), "Docker", "Docker", "resources", "bin", "docker.exe"),
+			filepath.Join(home, ".docker", "bin", "docker.exe"),
+		}
+	}
 	for _, candidate := range candidates {
 		if candidate == "docker" {
 			if path, err := exec.LookPath("docker"); err == nil {
@@ -39,7 +47,7 @@ func dockerExecutable() string {
 			}
 			continue
 		}
-		if info, err := os.Stat(candidate); err == nil && !info.IsDir() && info.Mode()&0o111 != 0 {
+		if info, err := os.Stat(candidate); err == nil && !info.IsDir() && (runtime.GOOS == "windows" || info.Mode()&0o111 != 0) {
 			return candidate
 		}
 	}
@@ -51,7 +59,7 @@ func dockerContainerPublishing(port int) *dockerContainer {
 	if exe == "" {
 		return nil
 	}
-	listed, err := exec.Command(exe, "ps", "--filter", fmt.Sprintf("publish=%d", port), "--format", "{{.ID}}").Output()
+	listed, err := helperCommand(exe, "ps", "--filter", fmt.Sprintf("publish=%d", port), "--format", "{{.ID}}").Output()
 	if err != nil {
 		return nil
 	}
@@ -60,7 +68,7 @@ func dockerContainerPublishing(port int) *dockerContainer {
 		return nil
 	}
 	args := append([]string{"inspect"}, ids...)
-	inspected, err := exec.Command(exe, args...).Output()
+	inspected, err := helperCommand(exe, args...).Output()
 	if err != nil {
 		return nil
 	}
@@ -113,7 +121,7 @@ func stopDockerContainer(container dockerContainer) error {
 	if exe == "" {
 		return fmt.Errorf("Docker CLI is unavailable, so Portly cannot identify the container safely")
 	}
-	out, err := exec.Command(exe, "stop", "--time", "10", container.ID).CombinedOutput()
+	out, err := helperCommand(exe, "stop", "--time", "10", container.ID).CombinedOutput()
 	if err != nil {
 		detail := strings.TrimSpace(string(out))
 		if detail == "" {

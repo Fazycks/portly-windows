@@ -1,0 +1,115 @@
+/* SettingsView.swift — Settings window (680×560), toolbar-style tabs. */
+:root { --st-primary: 0, 0, 0; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --st-primary: 255, 255, 255; }
+}
+:root[data-theme="dark"] { --st-primary: 255, 255, 255; }
+
+.st-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--window-bg);
+  color: var(--label);
+}
+
+/* macOS Settings toolbar: icon above label, centered, selected tab tinted. */
+.st-toolbar {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 12px 7px;
+  border-bottom: 0.5px solid var(--separator);
+}
+.st-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 64px;
+  padding: 5px 8px 4px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--secondary-label);
+}
+.st-tab:hover { background: var(--fill-hover); }
+.st-tab.selected { color: var(--accent); background: rgba(var(--st-primary), 0.07); }
+.st-tab-icon { display: inline-flex; height: 22px; align-items: center; }
+.st-tab-label { font-size: 11px; line-height: 13px; }
+.st-tab.selected .st-tab-label { font-weight: 500; }
+
+.st-content { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.st-content > .form-grouped { flex: 1 1 auto; min-height: 0; overflow: auto; }
+
+.st-disabled .form-row-label { color: var(--secondary-label); }
+
+.st-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--sys-green);
+}
+
+/* Intro rows (Label + caption) */
+.st-intro { align-items: flex-start; }
+.st-intro-stack { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.st-intro-title { display: inline-flex; align-items: center; gap: 6px; }
+
+.st-dot { display: inline-block; flex: none; border-radius: 50%; }
+.st-project-header { display: inline-flex; align-items: center; gap: 6px; }
+
+.st-idle-row { gap: 10px; }
+.st-idle-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+/* Memory tab */
+.st-global-row { gap: 10px; }
+.st-global-icon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sys-blue);
+  background: color-mix(in srgb, var(--sys-blue) 12%, transparent);
+}
+.st-stack-2 { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.st-memory-row { align-items: flex-start; gap: 10px; padding-top: 9px; padding-bottom: 9px; }
+.st-memory-row > .st-dot { margin-top: 4px; }
+.st-memory-row > .btn { align-self: center; }
+.st-memory-stack { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 0 1 300px; }
+.st-memory-title { display: flex; align-items: center; gap: 6px; }
+.st-pill { padding: 2px 6px; border-radius: 999px; }
+.st-progress {
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(var(--st-primary), 0.1);
+}
+.st-progress > span { display: block; height: 100%; border-radius: 2px; }
+.st-last-restart { display: inline-flex; align-items: center; gap: 4px; color: var(--sys-orange); }
+
+/* MemoryLimitEditor sheet (500×410) */
+.st-editor { display: flex; flex-direction: column; height: 410px; max-height: calc(100vh - 24px); }
+.st-editor-header { display: flex; flex-direction: column; gap: 3px; padding: 18px 20px 14px; }
+.st-editor > .form-grouped { min-height: 0; overflow: auto; }
+.st-radio-row { align-items: flex-start; }
+.st-radios { display: flex; flex-direction: column; gap: 6px; }
+.st-radio { display: inline-flex; align-items: center; gap: 6px; cursor: default; }
+.st-radio-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--control-bg);
+  box-shadow: inset 0 0 0 0.5px var(--control-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.st-radio-dot.on { background: var(--accent); box-shadow: none; }
+.st-radio-dot.on::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-text); }

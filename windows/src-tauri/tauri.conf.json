@@ -1,0 +1,87 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Portly",
+  "mainBinaryName": "Portly",
+  "version": "0.1.14",
+  "identifier": "dev.portly.windows",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build:daemon && pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Portly",
+        "url": "index.html#/main",
+        "width": 1080,
+        "height": 660,
+        "minWidth": 900,
+        "minHeight": 560,
+        "center": true,
+        "visible": false
+      },
+      {
+        "label": "popover",
+        "title": "Portly",
+        "url": "index.html#/popover",
+        "width": 320,
+        "height": 300,
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "visible": false,
+        "shadow": true
+      },
+      {
+        "label": "settings",
+        "title": "Portly Settings",
+        "url": "index.html#/settings",
+        "width": 680,
+        "height": 560,
+        "center": true,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Portly",
+    "copyright": "Copyright © Portly contributors. MIT License.",
+    "category": "DeveloperTool",
+    "shortDescription": "Run and supervise your local dev servers",
+    "longDescription": "Portly keeps your local development servers running: start, stop and restart them from the tray, watch their logs and ports, and let coding agents drive them through the portly CLI.",
+    "homepage": "https://github.com/Fazycks/portly-windows",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "bin/portly.exe": "bin/portly.exe",
+      "bin/portlyd.exe": "bin/portlyd.exe"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerHooks": "installer/hooks.nsh",
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

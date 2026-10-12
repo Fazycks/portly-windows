@@ -1,0 +1,58 @@
+.detail-toolbar {
+  flex: none;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px 0 20px;
+  background: var(--window-bg);
+  border-bottom: 0.5px solid var(--separator);
+}
+.detail-toolbar-titles {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+.detail-toolbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-toolbar-subtitle {
+  font-size: 11px;
+  color: var(--secondary-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-toolbar-items {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-button {
+  height: 28px;
+  min-width: 32px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--secondary-label);
+  transition: background var(--dur-hover) ease-out, color var(--dur-hover) ease-out;
+}
+.toolbar-button:hover:not(:disabled),
+.toolbar-button.open { background: var(--fill-secondary); color: var(--label); }
+.toolbar-button:active:not(:disabled) { background: var(--fill-hover); }
+.toolbar-button:disabled { opacity: 0.35; }
+.toolbar-menu-chevron { opacity: 0.8; }
