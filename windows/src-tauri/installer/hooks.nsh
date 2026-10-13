@@ -229,7 +229,9 @@ FunctionEnd
 ; unless the user already chose in Settings, ask once; a silent install or an
 ; update (the app's automatic update runs unattended) never turns it on and
 ; leaves the question for a later interactive install.
-Function Portly_SetupLaunchAtLogin
+; A macro, not a Function: this file is included before the template defines
+; MAINBINARYNAME and declares $UpdateMode, so only an insertion point sees them.
+!macro PORTLY_SETUP_LAUNCH_AT_LOGIN
   Push $0
   ClearErrors
   ReadRegStr $0 HKCU "${PORTLY_RUN_KEY}" "Portly"
@@ -248,7 +250,7 @@ Function Portly_SetupLaunchAtLogin
     WriteRegBin HKCU "${PORTLY_APPROVED_KEY}" "Portly" 020000000000000000000000
   portly_done:
   Pop $0
-FunctionEnd
+!macroend
 
 ; ---------------------------------------------------------------------------
 ; Hooks
@@ -276,7 +278,7 @@ FunctionEnd
 
 !macro NSIS_HOOK_POSTINSTALL
   Call Portly_AddToPath
-  Call Portly_SetupLaunchAtLogin
+  !insertmacro PORTLY_SETUP_LAUNCH_AT_LOGIN
 !macroend
 
 !macro NSIS_HOOK_PREUNINSTALL
