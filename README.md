@@ -24,6 +24,8 @@ pnpm tauri build
 
 The NSIS installer is written to `windows/src-tauri/target/release/bundle/nsis/`.
 
+**Updates:** each time the Portly process starts (sign-in or launching Portly.exe, not reopening a window from the tray), it reads `latest.json` from the latest release. A newer, signature-verified installer is downloaded and installed with a progress bar, then Portly restarts. Publish releases with `windows/release.sh [notes.md]` after bumping the version and pushing `main`: it signs the installer with the updater key (`~/.tauri/portly-windows.key`, whose public half is in `tauri.conf.json`) and uploads it together with `latest.json`.
+
 ## Smart resource dashboard
 
 The native **Resources** screen samples every Portly-owned process tree every two seconds and keeps a five-minute memory history. It shows physical footprint, resident RAM, CPU, project trends, and the current user's heaviest processes running outside Portly. Configure the optional global project limit and per-project inherit/off/custom overrides in **Settings → Memory**. A project restarts after three consecutive over-limit footprint samples, then sampling starts fresh on the replacement processes.

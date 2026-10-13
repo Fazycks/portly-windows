@@ -226,8 +226,9 @@ FunctionEnd
 
 ; Launch at login. An existing entry is kept and pointed at this install's
 ; Portly.exe (Task Manager's enabled/disabled state is left as is). Otherwise,
-; unless the user already chose in Settings, ask once; a silent install never
-; turns it on and leaves the question for a later interactive install.
+; unless the user already chose in Settings, ask once; a silent install or an
+; update (the app's automatic update runs unattended) never turns it on and
+; leaves the question for a later interactive install.
 Function Portly_SetupLaunchAtLogin
   Push $0
   ClearErrors
@@ -237,6 +238,7 @@ Function Portly_SetupLaunchAtLogin
     Goto portly_done
   portly_ask:
   IfSilent portly_done
+  StrCmp $UpdateMode 1 portly_done
   ClearErrors
   ReadRegDWORD $0 HKCU "${PORTLY_CHOICE_KEY}" "LaunchAtLoginChosen"
   IfErrors 0 portly_done

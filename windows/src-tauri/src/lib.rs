@@ -1,11 +1,13 @@
 //! Native shell of Portly for Windows: tray icon + popover (port of the macOS
 //! MenuBarExtra), main and settings windows, presentation preferences,
-//! launch at login, single instance, and starting the Go daemon (portlyd.exe).
+//! launch at login, single instance, update on launch, and starting the Go
+//! daemon (portlyd.exe).
 
 mod autostart;
 mod daemon;
 mod prefs;
 mod tray_glyph;
+mod updater;
 
 use prefs::Prefs;
 use serde_json::{Value, json};
@@ -393,10 +395,13 @@ fn write_app_path() {
     }
 }
 
-fn spawn_background(app: &AppHandle) {
+fn spawn_background(app: &AppHandle, at_login: bool) {
     let candidates = daemon_candidates(app);
     let handle = app.clone();
     std::thread::spawn(move || {
+        // Before the daemon: an update's installer would stop it, and every
+        // server it had just restored, right away.
+        updater::update_on_launch(&handle, at_login);
         daemon::ensure_running(&candidates);
         // Hidden webviews throttle their timers, so the tray glyph is also fed
         // from here. This also picks up taskbar theme and DPI changes.
@@ -423,6 +428,7 @@ pub fn run() {
         }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(AppState(Mutex::new(Shared { prefs: Prefs::load(), ..Default::default() })))
         .setup(|app| {
             let handle = app.handle().clone();
@@ -430,9 +436,9 @@ pub fn run() {
             build_tray(&handle)?;
             let prefs = state(&handle).prefs;
             apply_prefs(&handle, &prefs);
-            spawn_background(&handle);
-
             let args: Vec<String> = std::env::args().collect();
+            spawn_background(&handle, is_hidden_launch(&args));
+
             if let Some(route) = parse_route(&args) {
                 show_window(&handle, "main");
                 // Let the main view mount and subscribe to "navigate" first.
