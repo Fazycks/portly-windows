@@ -1,7 +1,8 @@
 //! Native shell of Portly for Windows: tray icon + popover (port of the macOS
 //! MenuBarExtra), main and settings windows, presentation preferences,
-//! autostart, single instance, and starting the Go daemon (portlyd.exe).
+//! launch at login, single instance, and starting the Go daemon (portlyd.exe).
 
+mod autostart;
 mod daemon;
 mod prefs;
 mod tray_glyph;
@@ -16,7 +17,6 @@ use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}
 use tauri::{
     AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize, Rect, RunEvent, WebviewWindow, WindowEvent,
 };
-use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_opener::OpenerExt;
 
 const TRAY_ID: &str = "portly";
@@ -346,15 +346,13 @@ fn set_prefs(app: AppHandle, prefs: Value) -> Result<Prefs, String> {
 }
 
 #[tauri::command]
-fn get_autostart(app: AppHandle) -> Result<bool, String> {
-    app.autolaunch().is_enabled().map_err(|e| e.to_string())
+fn get_autostart() -> Result<bool, String> {
+    autostart::is_enabled()
 }
 
 #[tauri::command]
-fn set_autostart(app: AppHandle, enabled: bool) -> Result<bool, String> {
-    let launcher = app.autolaunch();
-    if enabled { launcher.enable() } else { launcher.disable() }.map_err(|e| e.to_string())?;
-    launcher.is_enabled().map_err(|e| e.to_string())
+fn set_autostart(enabled: bool) -> Result<bool, String> {
+    autostart::set_enabled(enabled)
 }
 
 #[tauri::command]
@@ -423,7 +421,6 @@ pub fn run() {
                 open_main(app.clone(), None);
             }
         }))
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--hidden"])))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .manage(AppState(Mutex::new(Shared { prefs: Prefs::load(), ..Default::default() })))

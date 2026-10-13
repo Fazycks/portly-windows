@@ -1,3 +1,3 @@
 package main
 
-const portlyVersion = "0.1.15"
+const portlyVersion = "0.1.16"

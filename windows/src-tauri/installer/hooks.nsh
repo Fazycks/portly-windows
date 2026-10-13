@@ -25,6 +25,10 @@
 
 !define PORTLY_OLD_DIR "$LOCALAPPDATA\Programs\Portly"
 !define PORTLY_OLD_UNINSTALLER "$LOCALAPPDATA\Programs\Portly\Uninstall Portly.exe"
+;  Launch at login: same names as src-tauri/src/autostart.rs.
+!define PORTLY_RUN_KEY "Software\Microsoft\Windows\CurrentVersion\Run"
+!define PORTLY_APPROVED_KEY "Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"
+!define PORTLY_CHOICE_KEY "Software\Portly"
 !define PORTLY_PS "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command"
 
 ; ---------------------------------------------------------------------------
@@ -220,6 +224,30 @@ Function un.Portly_RemoveFromPathPowerShell
   !insertmacro PORTLY_BROADCAST_ENVIRONMENT
 FunctionEnd
 
+; Launch at login. An existing entry is kept and pointed at this install's
+; Portly.exe (Task Manager's enabled/disabled state is left as is). Otherwise,
+; unless the user already chose in Settings, ask once; a silent install never
+; turns it on and leaves the question for a later interactive install.
+Function Portly_SetupLaunchAtLogin
+  Push $0
+  ClearErrors
+  ReadRegStr $0 HKCU "${PORTLY_RUN_KEY}" "Portly"
+  IfErrors portly_ask
+    WriteRegStr HKCU "${PORTLY_RUN_KEY}" "Portly" '"$INSTDIR\${MAINBINARYNAME}.exe" --hidden'
+    Goto portly_done
+  portly_ask:
+  IfSilent portly_done
+  ClearErrors
+  ReadRegDWORD $0 HKCU "${PORTLY_CHOICE_KEY}" "LaunchAtLoginChosen"
+  IfErrors 0 portly_done
+  WriteRegDWORD HKCU "${PORTLY_CHOICE_KEY}" "LaunchAtLoginChosen" 1
+  MessageBox MB_YESNO|MB_ICONQUESTION "Launch Portly automatically when you sign in to Windows?$\r$\n$\r$\nPortly will start in the tray. You can change this later in Portly Settings > General." IDNO portly_done
+    WriteRegStr HKCU "${PORTLY_RUN_KEY}" "Portly" '"$INSTDIR\${MAINBINARYNAME}.exe" --hidden'
+    WriteRegBin HKCU "${PORTLY_APPROVED_KEY}" "Portly" 020000000000000000000000
+  portly_done:
+  Pop $0
+FunctionEnd
+
 ; ---------------------------------------------------------------------------
 ; Hooks
 
@@ -246,6 +274,7 @@ FunctionEnd
 
 !macro NSIS_HOOK_POSTINSTALL
   Call Portly_AddToPath
+  Call Portly_SetupLaunchAtLogin
 !macroend
 
 !macro NSIS_HOOK_PREUNINSTALL
@@ -254,6 +283,13 @@ FunctionEnd
   nsExec::Exec 'schtasks.exe /Delete /TN "Portly Forever" /F'
   Pop $0
   Pop $0
+  ; Updates run the old uninstaller with /UPDATE: keep the user's choice then.
+  ${If} $UpdateMode <> 1
+    DeleteRegValue HKCU "${PORTLY_RUN_KEY}" "Portly"
+    DeleteRegValue HKCU "${PORTLY_APPROVED_KEY}" "Portly"
+    DeleteRegValue HKCU "${PORTLY_CHOICE_KEY}" "LaunchAtLoginChosen"
+    DeleteRegKey /ifempty HKCU "${PORTLY_CHOICE_KEY}"
+  ${EndIf}
 !macroend
 
 !macro NSIS_HOOK_POSTUNINSTALL

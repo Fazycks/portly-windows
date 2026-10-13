@@ -73,8 +73,13 @@ function GeneralSettingsView() {
   const [launchAtLogin, setLaunchAtLogin] = useState(false);
   const [loginItemError, setLoginItemError] = useState<string | null>(null);
 
+  // Re-read on focus: the window is hidden, not closed, and Task Manager's
+  // Startup tab can change the setting meanwhile.
   useEffect(() => {
-    native.getAutostart().then(setLaunchAtLogin).catch(() => {});
+    const load = () => native.getAutostart().then(setLaunchAtLogin).catch(() => {});
+    load();
+    window.addEventListener("focus", load);
+    return () => window.removeEventListener("focus", load);
   }, []);
 
   // AppPresentation.load(): repair a state where both surfaces are hidden.

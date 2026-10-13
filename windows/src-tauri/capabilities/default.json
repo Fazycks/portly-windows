@@ -22,7 +22,6 @@
       "allow": [{ "path": "C:\\Windows\\System32\\Taskmgr.exe" }]
     },
     "dialog:default",
-    "dialog:allow-open",
-    "autostart:default"
+    "dialog:allow-open"
   ]
 }
