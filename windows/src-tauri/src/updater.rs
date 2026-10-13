@@ -30,6 +30,7 @@ pub fn update_on_launch(app: &AppHandle, at_login: bool) {
     if cfg!(debug_assertions) {
         return;
     }
+    remove_old_installers();
     let retries = if at_login { LOGIN_RETRIES } else { 0 };
     for attempt in 0..=retries {
         if attempt > 0 {
@@ -38,6 +39,19 @@ pub fn update_on_launch(app: &AppHandle, at_login: bool) {
         match tauri::async_runtime::block_on(check_and_install(app.clone())) {
             Ok(()) => return,
             Err(e) => eprintln!("Portly update check failed: {e}"),
+        }
+    }
+}
+
+/// The plugin keeps each downloaded installer in `%TEMP%\Portly-<version>-updater-*`;
+/// by the time Portly runs again, that installer has finished.
+fn remove_old_installers() {
+    let Ok(entries) = std::fs::read_dir(std::env::temp_dir()) else { return };
+    for entry in entries.flatten() {
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if name.starts_with("Portly-") && name.contains("-updater-") && entry.path().is_dir() {
+            let _ = std::fs::remove_dir_all(entry.path());
         }
     }
 }
