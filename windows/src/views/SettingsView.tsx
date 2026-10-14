@@ -124,7 +124,11 @@ function GeneralSettingsView() {
             />
           </div>
         </div>
-        <TextRow caption>Drag Portly to reposition it in the system tray.</TextRow>
+        <TextRow caption>
+          {prefs.showInTray
+            ? "Drag Portly to reposition it in the system tray."
+            : "Portly keeps running from its taskbar button. Press Ctrl+, in the main window to open Settings."}
+        </TextRow>
       </Section>
 
       <Section header="Taskbar">
@@ -160,6 +164,10 @@ function GeneralSettingsView() {
             void native.openMain();
           }}>Show Agent Setup</Button>
         </div>
+        <div className="form-row">
+          <Button onClick={() => void native.quit().catch(() => {})}>Quit Portly</Button>
+        </div>
+        <TextRow caption>Quitting stops every server Portly supervises.</TextRow>
       </Section>
 
       <Alert

@@ -103,6 +103,20 @@
 }
 .kill-all:disabled { color: color-mix(in srgb, var(--secondary-label) 45%, transparent); }
 .kill-all:active:not(:disabled) { opacity: 0.6; }
+.sidebar-settings {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: var(--primary-055);
+  color: var(--primary-78);
+}
+.sidebar-settings:active { opacity: 0.6; }
 
 /* List(.sidebar) */
 .sidebar-list-wrap {

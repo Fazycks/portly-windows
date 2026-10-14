@@ -236,9 +236,57 @@ fn apply_prefs(app: &AppHandle, prefs: &Prefs) {
     }
     if !prefs.show_in_tray {
         hide_popover_window(app);
+        keep_taskbar_button(app);
     }
     refresh_tray(app);
 }
+
+/// Without a tray icon, the main window's taskbar button is the only way back
+/// into Portly (like the Dock icon on macOS): never leave it hidden, park it
+/// minimized instead. Minimizing first makes `show` keep it minimized, so the
+/// window does not flash on screen.
+fn keep_taskbar_button(app: &AppHandle) {
+    let handle = app.clone();
+    // On the main thread so the window calls run inline, before focus is restored.
+    let _ = app.run_on_main_thread(move || {
+        let Some(w) = handle.get_webview_window("main") else { return };
+        if w.is_visible().unwrap_or(false) {
+            return;
+        }
+        // `show` activates the minimized window: give the focus back to the
+        // window the user is in (Settings, or another app at login).
+        let previous = foreground_window();
+        let _ = w.minimize();
+        // The first ShowWindow of the process gets the launcher's show command
+        // (normal at login) instead of ours; the next one is honored.
+        if !w.is_minimized().unwrap_or(true) {
+            let _ = w.minimize();
+        }
+        let _ = w.show();
+        let _ = w.set_skip_taskbar(false);
+        restore_foreground(previous);
+    });
+}
+
+#[cfg(windows)]
+fn foreground_window() -> windows_sys::Win32::Foundation::HWND {
+    // SAFETY: plain query, no arguments.
+    unsafe { windows_sys::Win32::UI::WindowsAndMessaging::GetForegroundWindow() }
+}
+
+#[cfg(windows)]
+fn restore_foreground(hwnd: windows_sys::Win32::Foundation::HWND) {
+    if !hwnd.is_null() {
+        // SAFETY: a stale handle only makes the call fail.
+        unsafe { windows_sys::Win32::UI::WindowsAndMessaging::SetForegroundWindow(hwnd) };
+    }
+}
+
+#[cfg(not(windows))]
+fn foreground_window() {}
+
+#[cfg(not(windows))]
+fn restore_foreground(_: ()) {}
 
 /// `--open server:<id>|project:<id>|resources|ports` (also `--open=<target>`).
 fn parse_route(args: &[String]) -> Option<Value> {
@@ -434,8 +482,6 @@ pub fn run() {
             let handle = app.handle().clone();
             write_app_path();
             build_tray(&handle)?;
-            let prefs = state(&handle).prefs;
-            apply_prefs(&handle, &prefs);
             let args: Vec<String> = std::env::args().collect();
             spawn_background(&handle, is_hidden_launch(&args));
 
@@ -450,6 +496,10 @@ pub fn run() {
             } else if !is_hidden_launch(&args) {
                 show_window(&handle, "main");
             }
+            // After the main window is shown, so a hidden launch without a tray
+            // icon still leaves a (minimized) taskbar button.
+            let prefs = state(&handle).prefs;
+            apply_prefs(&handle, &prefs);
             Ok(())
         })
         .on_window_event(|window, event| match (window.label(), event) {

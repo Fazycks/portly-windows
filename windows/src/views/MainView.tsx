@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { api, isActiveState, type Project, type ServerConfig, type ServerStatus } from "../lib/api";
 import { act, usePortly, useTick } from "../lib/store";
-import { onNavigate, openExternal, reveal, usePrefs, type MainRoute } from "../lib/native";
+import { native, onNavigate, openExternal, reveal, usePrefs, type MainRoute } from "../lib/native";
 import { Button, ContentUnavailable, Sheet, StatusDot, T, compactUptime, formatBytes, hexColor, pressureColor } from "../components/ui";
 import { ProjectForm, ServerForm, TemporaryProcessForm } from "./Forms";
 import { AgentOnboardingCard } from "./AgentSetup";
@@ -103,6 +103,18 @@ export default function MainView() {
       .then((u) => { if (cancelled) u(); else un = u; })
       .catch(() => {});
     return () => { cancelled = true; un?.(); };
+  }, []);
+
+  // Settings… (⌘, on macOS). Capture phase: the terminal would swallow it.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "," || !e.ctrlKey || e.altKey || e.shiftKey || e.metaKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      void native.openSettings();
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, []);
 
   // clearFinishedTemporarySelection
@@ -266,6 +278,15 @@ export default function MainView() {
         >
           <Icon name="stop.fill" size={11} />
           <span>Kill All</span>
+        </button>
+        {/* The app menu's Settings… (⌘,): reachable even when the tray icon is hidden. */}
+        <button
+          className="sidebar-settings"
+          title="Settings (Ctrl+,)"
+          aria-label="Settings"
+          onClick={() => void native.openSettings()}
+        >
+          <Icon name="gearshape" size={13} />
         </button>
       </div>
 
